@@ -8,6 +8,7 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
@@ -233,11 +234,11 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
         access_token = self.coordinator.config_entry.data.get("access_token")
         
         if proxy_url and access_token:
-            client = self.coordinator.controller._client
+            session = async_get_clientsession(self.hass)
             url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.vin}/command/open_tonneau"
             try:
-                response = await client.post(url, headers={"Authorization": f"Bearer {access_token}"})
-                _LOGGER.debug("Open tonneau response: %s", response.status_code)
+                response = await session.post(url, headers={"Authorization": f"Bearer {access_token}"}, ssl=False)
+                _LOGGER.debug("Open tonneau response: %s", response.status)
             except Exception as e:
                 _LOGGER.error("Failed to send open tonneau command: %s", e)
         else:
@@ -253,11 +254,11 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
         access_token = self.coordinator.config_entry.data.get("access_token")
         
         if proxy_url and access_token:
-            client = self.coordinator.controller._client
+            session = async_get_clientsession(self.hass)
             url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.vin}/command/close_tonneau"
             try:
-                response = await client.post(url, headers={"Authorization": f"Bearer {access_token}"})
-                _LOGGER.debug("Close tonneau response: %s", response.status_code)
+                response = await session.post(url, headers={"Authorization": f"Bearer {access_token}"}, ssl=False)
+                _LOGGER.debug("Close tonneau response: %s", response.status)
             except Exception as e:
                 _LOGGER.error("Failed to send close tonneau command: %s", e)
         else:
@@ -273,11 +274,11 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
         access_token = self.coordinator.config_entry.data.get("access_token")
         
         if proxy_url and access_token:
-            client = self.coordinator.controller._client
+            session = async_get_clientsession(self.hass)
             url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.vin}/command/stop_tonneau"
             try:
-                response = await client.post(url, headers={"Authorization": f"Bearer {access_token}"})
-                _LOGGER.debug("Stop tonneau response: %s", response.status_code)
+                response = await session.post(url, headers={"Authorization": f"Bearer {access_token}"}, ssl=False)
+                _LOGGER.debug("Stop tonneau response: %s", response.status)
             except Exception as e:
                 _LOGGER.error("Failed to send stop tonneau command: %s", e)
         else:
