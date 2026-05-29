@@ -51,7 +51,11 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Return True if steering wheel heater is available."""
-        return super().available and self._car.steering_wheel_heater
+        is_cybertruck = (
+            (self._car.car_type and "cybertruck" in self._car.car_type.lower())
+            or (self._car.vin and len(self._car.vin) >= 4 and self._car.vin[3].upper() == "C")
+        )
+        return super().available and (is_cybertruck or self._car.steering_wheel_heater)
 
     @property
     def is_on(self):
@@ -133,18 +137,30 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
     ) -> None:
         """Initialize sentry mode entity."""
         # Entity is only enabled upon first install if sentry mode is available
-        self._enabled_by_default = car.sentry_mode_available
+        is_cybertruck = (
+            (car.car_type and "cybertruck" in car.car_type.lower())
+            or (car.vin and len(car.vin) >= 4 and car.vin[3].upper() == "C")
+        )
+        self._enabled_by_default = is_cybertruck or car.sentry_mode_available
         super().__init__(car, coordinator)
 
     @property
     def available(self) -> bool:
         """Return True if sentry mode switch is available."""
-        return super().available and self._car.sentry_mode_available
+        is_cybertruck = (
+            (self._car.car_type and "cybertruck" in self._car.car_type.lower())
+            or (self._car.vin and len(self._car.vin) >= 4 and self._car.vin[3].upper() == "C")
+        )
+        return super().available and (is_cybertruck or self._car.sentry_mode_available)
 
     @property
     def is_on(self):
         """Return True if sentry mode is on."""
-        sentry_mode_available = self._car.sentry_mode_available
+        is_cybertruck = (
+            (self._car.car_type and "cybertruck" in self._car.car_type.lower())
+            or (self._car.vin and len(self._car.vin) >= 4 and self._car.vin[3].upper() == "C")
+        )
+        sentry_mode_available = is_cybertruck or self._car.sentry_mode_available
         sentry_mode_status = self._car.sentry_mode
         return bool(sentry_mode_available and sentry_mode_status)
 
