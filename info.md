@@ -39,14 +39,15 @@ _Component built with [integration_blueprint][integration_blueprint]._
 ---
 
 [integration_blueprint]: https://github.com/custom-components/integration_blueprint
-[commits-shield]: https://img.shields.io/github/commit-activity/y/jamesdmartinez/tesla-custom.svg?style=for-the-badge
-[commits]: https://github.com/jamesdmartinez/tesla-custom/commits/main
+[commits-shield]: https://img.shields.io/github/commit-activity/y/jamesdmartinez/tesla-HA.svg?style=for-the-badge
+[commits]: https://github.com/jamesdmartinez/tesla-HA/commits/main
 [hacs]: https://github.com/custom-components/hacs
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
-[license-shield]: https://img.shields.io/github/license/jamesdmartinez/tesla-custom.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/jamesdmartinez/tesla-HA.svg?style=for-the-badge
 [license]: LICENSE
-[releases-shield]: https://img.shields.io/github/release/jamesdmartinez/tesla-custom.svg?style=for-the-badge
-[releases]: https://github.com/jamesdmartinez/tesla-custom/releases
+[releases-shield]: https://img.shields.io/github/release/jamesdmartinez/tesla-HA.svg?style=for-the-badge
+[releases]: https://github.com/jamesdmartinez/tesla-HA/releases
 [add-integration]: https://my.home-assistant.io/redirect/config_flow_start?domain=tesla_custom
 [add-integration-badge]: https://my.home-assistant.io/badges/config_flow_start.svg
+
 
