@@ -235,10 +235,11 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
         
         if proxy_url and access_token:
             session = async_get_clientsession(self.hass)
-            url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.vin}/command/open_tonneau"
+            url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.id}/command/open_tonneau"
             try:
                 response = await session.post(url, headers={"Authorization": f"Bearer {access_token}"}, ssl=False)
-                _LOGGER.debug("Open tonneau response: %s", response.status)
+                response_text = await response.text()
+                _LOGGER.debug("Open tonneau response: %s - %s", response.status, response_text)
             except Exception as e:
                 _LOGGER.error("Failed to send open tonneau command: %s", e)
         else:
@@ -255,10 +256,11 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
         
         if proxy_url and access_token:
             session = async_get_clientsession(self.hass)
-            url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.vin}/command/close_tonneau"
+            url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.id}/command/close_tonneau"
             try:
                 response = await session.post(url, headers={"Authorization": f"Bearer {access_token}"}, ssl=False)
-                _LOGGER.debug("Close tonneau response: %s", response.status)
+                response_text = await response.text()
+                _LOGGER.debug("Close tonneau response: %s - %s", response.status, response_text)
             except Exception as e:
                 _LOGGER.error("Failed to send close tonneau command: %s", e)
         else:
@@ -275,10 +277,11 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
         
         if proxy_url and access_token:
             session = async_get_clientsession(self.hass)
-            url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.vin}/command/stop_tonneau"
+            url = f"{proxy_url.rstrip('/')}/api/1/vehicles/{self._car.id}/command/stop_tonneau"
             try:
                 response = await session.post(url, headers={"Authorization": f"Bearer {access_token}"}, ssl=False)
-                _LOGGER.debug("Stop tonneau response: %s", response.status)
+                response_text = await response.text()
+                _LOGGER.debug("Stop tonneau response: %s - %s", response.status, response_text)
             except Exception as e:
                 _LOGGER.error("Failed to send stop tonneau command: %s", e)
         else:
@@ -289,18 +292,29 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
     @property
     def is_closed(self):
         """Return True if tonneau cover is closed."""
-        # Try to get open percentage from vehicle state
-        open_percent = self._car._vehicle_data.get("vehicle_state", {}).get("tonneau_open_percent")
+        state = self._car._vehicle_data.get("vehicle_state", {})
+        open_percent = state.get("tonneau_open_percent")
+        if open_percent is None:
+            open_percent = state.get("TonneauOpenPercent")
+        
+        # Log available keys in vehicle_state for debugging purposes
+        tonneau_keys = [k for k in state.keys() if "tonneau" in k.lower()]
+        _LOGGER.debug("Cybertruck tonneau keys in vehicle_state: %s (values: %s)", tonneau_keys, {k: state.get(k) for k in tonneau_keys})
+
         if open_percent is not None:
             return open_percent == 0
         
-        # Fallback to general cover position or state (close = open_percent == 0)
-        return True
+        # Fallback to None (unknown) so both Open and Close buttons remain active
+        return None
 
     @property
     def current_cover_position(self):
         """Return current position of tonneau cover."""
-        open_percent = self._car._vehicle_data.get("vehicle_state", {}).get("tonneau_open_percent")
+        state = self._car._vehicle_data.get("vehicle_state", {})
+        open_percent = state.get("tonneau_open_percent")
+        if open_percent is None:
+            open_percent = state.get("TonneauOpenPercent")
+            
         if open_percent is not None:
             # Home Assistant expects 0 to 100 where 0 is closed and 100 is fully open.
             return open_percent
