@@ -220,7 +220,7 @@ class TeslaCarTonneau(TeslaCarEntity, CoverEntity):
     """Representation of a Tesla Cybertruck tonneau cover."""
 
     type = "tonneau cover"
-    _attr_device_class = CoverDeviceClass.SHUTTER
+    _attr_device_class = CoverDeviceClass.SHADE
     _attr_icon = "mdi:truck-cargo-integration"
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.STOP
 
