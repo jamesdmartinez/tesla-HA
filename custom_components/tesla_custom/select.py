@@ -100,15 +100,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for vin, car in cars.items():
         coordinator = coordinators[vin]
         entities.append(TeslaCarCabinOverheatProtection(car, coordinator))
-        is_cybertruck = (
-            (car.car_type and "cybertruck" in car.car_type.lower())
-            or (car.vin and len(car.vin) >= 4 and car.vin[3].upper() == "C")
+        is_affected_model = (
+            (car.car_type and any(m in car.car_type.lower() for m in ["cybertruck", "model y", "model 3"]))
+            or (car.vin and len(car.vin) >= 4 and car.vin[3].upper() in ["C", "Y", "3"])
         )
-        if is_cybertruck or car.get_heated_steering_wheel_level() is not None:
+        if is_affected_model or car.get_heated_steering_wheel_level() is not None:
             # Only add steering wheel select if we have a variable heated steering wheel
             entities.append(TeslaCarHeatedSteeringWheel(car, coordinator))
         for seat_name in SEAT_ID_MAP:
-            if "rear" in seat_name and not (is_cybertruck or car.rear_seat_heaters):
+            if "rear" in seat_name and not (is_affected_model or car.rear_seat_heaters):
                 continue
             # Check for str "None" (car does not have third row seats)
             # or None (car is asleep)
@@ -302,11 +302,11 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ):
         """Initialize heated steering wheel entity."""
-        is_cybertruck = (
-            (car.car_type and "cybertruck" in car.car_type.lower())
-            or (car.vin and len(car.vin) >= 4 and car.vin[3].upper() == "C")
+        is_affected_model = (
+            (car.car_type and any(m in car.car_type.lower() for m in ["cybertruck", "model y", "model 3"]))
+            or (car.vin and len(car.vin) >= 4 and car.vin[3].upper() in ["C", "Y", "3"])
         )
-        self._enabled_by_default = is_cybertruck or car.steering_wheel_heater
+        self._enabled_by_default = is_affected_model or car.steering_wheel_heater
         super().__init__(car, coordinator)
 
     async def async_select_option(self, option: str, **kwargs):
@@ -359,11 +359,11 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
     @property
     def available(self) -> bool:
         """Return True if steering wheel heater is available."""
-        is_cybertruck = (
-            (self._car.car_type and "cybertruck" in self._car.car_type.lower())
-            or (self._car.vin and len(self._car.vin) >= 4 and self._car.vin[3].upper() == "C")
+        is_affected_model = (
+            (self._car.car_type and any(m in self._car.car_type.lower() for m in ["cybertruck", "model y", "model 3"]))
+            or (self._car.vin and len(self._car.vin) >= 4 and self._car.vin[3].upper() in ["C", "Y", "3"])
         )
-        return super().available and (is_cybertruck or self._car.steering_wheel_heater)
+        return super().available and (is_affected_model or self._car.steering_wheel_heater)
 
 
 class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
